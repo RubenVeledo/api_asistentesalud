@@ -1,25 +1,26 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+from fastapi.requests import Request
+
 from app.routes import routine, diet
 
+# Crear instancia de la aplicación FastAPI
 app = FastAPI()
 
-# Carpeta de templates
+# Configurar rutas y plantillas
 templates = Jinja2Templates(directory="app/templates")
 
-# Archivos estáticos (opcional, para CSS o JS si se quisiera implementar)
-#app.mount("/static", StaticFiles(directory="static"), name="static")
-
-# Endpoints
+# Incluir routers
 app.include_router(routine.router)
 app.include_router(diet.router)
 
-# Renderizar la página principal
+# Endpoint raíz que renderiza la página principal
 @app.get("/", response_class=HTMLResponse)
-async def root(request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def home(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
+
 
 
 

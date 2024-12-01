@@ -7,6 +7,9 @@ from app.database.database import get_connection
 from app.config import client
 
 router = APIRouter()
+
+memory = ConversationBufferMemory(return_messages=True, memory_key="history", input_key="input")
+
 templates = Jinja2Templates(directory="app/templates")  # Configuración de templates
 
 # Configurar memoria conversacional
