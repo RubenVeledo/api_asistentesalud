@@ -1,10 +1,13 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request, Form
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 from app.database.database import get_connection
 from app.config import client
 
 router = APIRouter()
+templates = Jinja2Templates(directory="app/templates")  # Configuración de templates
 
 # Configurar memoria conversacional
 memory = ConversationBufferMemory()
@@ -13,13 +16,14 @@ memory = ConversationBufferMemory()
 diet_prompt_template = PromptTemplate(
     input_variables=["goal", "preferences"],
     template=(
-        "Soy un experto en nutrición. Genera un plan de comidas para un día enfocado en {goal} y respetando las "
+        "Soy un experto en nutrición de fitness. Genera un plan de comidas para un día enfocado en {goal} y respetando las "
         "siguientes preferencias alimenticias: {preferences}. Incluye únicamente las siguientes comidas:\n\n"
         "1. Desayuno: Nombre del plato\n"
         "2. Almuerzo: Nombre del plato\n"
         "3. Comida: Nombre del plato\n"
         "4. Cena: Nombre del plato\n\n"
-        "No incluyas demasiados detalles ni información sobre suplementos"
+        "No incluyas demasiados detalles ni información sobre suplementos."
+        "En idioma español de España."
     )
 )
 
@@ -37,11 +41,20 @@ def evaluate_diet(response: str) -> dict:
     evaluation["aprobado"] = all(evaluation.values())  # Aprueba solo si todos los criterios se cumplen
     return evaluation
 
-@router.post("/dieta")
-async def generate_diet(goal: str, preferences: str):
+# Ruta GET para renderizar el formulario
+@router.get("/dieta", response_class=HTMLResponse)
+async def get_diet_page(request: Request):
+    """
+    Renderiza la página HTML para solicitar los datos de la dieta.
+    """
+    return templates.TemplateResponse("diet.html", {"request": request})
+
+# Ruta POST para procesar los datos y mostrar el resultado
+@router.post("/dieta", response_class=HTMLResponse)
+async def post_diet(request: Request, goal: str = Form(...), preferences: str = Form(...)):
     """
     Genera un plan de comidas personalizado para un solo día.
-    Guarda la dieta generada en la base de datos.
+    Guarda la dieta generada en la base de datos y la muestra al usuario.
     """
     try:
         # Inicializar variables
@@ -99,8 +112,14 @@ async def generate_diet(goal: str, preferences: str):
             f"y adaptado a tus preferencias: {preferences.lower()}."
         )
 
-        # Responder al usuario con la dieta completa
-        return {"message": user_message, "diet": diet}
+        # Responder al usuario con la dieta en el template
+        return templates.TemplateResponse("diet.html", {
+            "request": request,
+            "diet": diet,
+            "message": user_message,  # Enviar el mensaje motivacional al template
+            "goal": goal,
+            "preferences": preferences
+        })
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al generar dieta: {e}")
@@ -108,6 +127,7 @@ async def generate_diet(goal: str, preferences: str):
     finally:
         if connection:
             connection.close()
+
 
 
 

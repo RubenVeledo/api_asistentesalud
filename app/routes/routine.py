@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request, Form
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 import random
@@ -6,6 +8,7 @@ from app.database.database import get_connection
 from app.config import client 
 
 router = APIRouter()
+templates = Jinja2Templates(directory="app/templates")  # Configuración de templates
 
 # Configurar memoria conversacional
 memory = ConversationBufferMemory()
@@ -15,6 +18,8 @@ template = """
 Eres un asistente virtual experto en fitness y salud. Tu tarea es crear rutinas de ejercicios personalizadas 
 según las necesidades del usuario. Cada rutina debe incluir un calentamiento inicial, ejercicios principales 
 y un enfriamiento final. Proporciona la rutina de forma clara, organizada y adecuada para el nivel del usuario.
+Recuerda poner la duración en cada ejercicio para que se adapte perfectamente al tiempo indicado por el usuario.
+Los comentarios adicionales finales deben ser muy cortos y sencillos en caso de que los haya. En idioma español de España.
 
 Información proporcionada:
 - Nivel de experiencia: {level}
@@ -53,13 +58,25 @@ def evaluate_response(response: str) -> dict:
     evaluation["aprobado"] = all(evaluation.values())  # Aprueba solo si todos los criterios se cumplen
     return evaluation
 
-@router.post("/routine")
-async def generate_routine(level: str, time: int, equipment: str, goal: str):
+# Ruta GET para renderizar el formulario
+@router.get("/routine", response_class=HTMLResponse)
+async def get_routine_page(request: Request):
+    """
+    Renderiza la página HTML para solicitar los datos de rutina.
+    """
+    return templates.TemplateResponse("routine.html", {"request": request})
+
+# Ruta POST para procesar el formulario y mostrar el resultado
+@router.post("/routine", response_class=HTMLResponse)
+async def post_routine(request: Request, level: str = Form(...), time: int = Form(...), equipment: str = Form(...), goal: str = Form(...)):
     """
     Genera una rutina de ejercicios personalizada utilizando memoria conversacional.
     Evalúa su calidad y, si no cumple, solicita una nueva respuesta.
-    Guarda la rutina generada en la base de datos.
+    Guarda la rutina generada en la base de datos y la muestra al usuario.
     """
+
+    connection = None  # Inicializar la variable
+
     try:
         # Recuperar el historial de memoria
         context = memory.load_memory_variables({})
@@ -131,8 +148,16 @@ async def generate_routine(level: str, time: int, equipment: str, goal: str):
             cursor.execute(insert_query, (level, time, equipment, goal, routine))
             connection.commit()
 
-        # Responder al usuario con la rutina y el mensaje personalizado
-        return {"message": user_message, "routine": routine}
+        # Responder al usuario con la rutina, mensaje motivacional y datos ingresados
+        return templates.TemplateResponse("routine.html", {
+            "request": request,
+            "routine": routine,
+            "message": user_message,  # Enviar el mensaje al template
+            "level": level,
+            "time": time,
+            "equipment": equipment,
+            "goal": goal
+        })
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al generar rutina: {e}")
@@ -140,5 +165,7 @@ async def generate_routine(level: str, time: int, equipment: str, goal: str):
     finally:
         if connection:
             connection.close()
+
+
 
 
