@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio - Asesor Personal de Salud</title>
+    <title>Inicio - Salus AI</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -27,36 +27,49 @@
 <body>
     <div class="container mx-auto px-4">
         <!-- Encabezado principal -->
-        <h1 class="text-center text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 mb-10">
-            🏋️‍♂️ Bienvenido a tu Asesor Personal de Salud 🥗
+        <h1 class="text-center text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-600 mb-10">
+            🤖 Bienvenido a <span class="text-pink-400">Salus AI</span> 💪
         </h1>
+        <p class="text-lg text-gray-300 text-center mb-6">
+            Salus AI es tu guía inteligente en el camino hacia tu bienestar físico.
+        </p>
 
         <!-- Tarjeta de bienvenida -->
         <div class="glass-card p-8 mb-8 max-w-2xl mx-auto">
             <p class="text-lg text-gray-300 text-center mb-6">
-                Aquí puedes generar <strong class="text-green-400">rutinas personalizadas</strong> y
-                <strong class="text-yellow-400">planes de alimentación</strong> adaptados a tus objetivos. 
+                Aquí puedes generar <strong class="text-green-400">rutinas personalizadas</strong>, 
+                <strong class="text-yellow-400">planes de alimentación</strong> y 
+                <strong class="text-pink-400">recomendaciones de suplementos</strong> adaptados a tus objetivos. 
                 ¡Comienza ahora para transformar tu estilo de vida!
             </p>
         </div>
 
         <!-- Opciones de navegación -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <!-- Opción 1: Rutinas -->
             <a href="/routine" class="glass-card p-6 hover:bg-gradient-to-r hover:from-green-400 hover:to-blue-500 hover:text-white transition-all transform hover:scale-105 text-center">
-                <h2 class="text-2xl font-bold mb-4">💪 Generar Rutina</h2>
+                <h2 class="text-2xl font-bold mb-4">💪 Generar rutina</h2>
                 <p class="text-gray-300">Crea una rutina de ejercicios adaptada a tu nivel, equipamiento y objetivos personales.</p>
             </a>
 
             <!-- Opción 2: Dietas -->
             <a href="/dieta" class="glass-card p-6 hover:bg-gradient-to-r hover:from-orange-400 hover:to-yellow-500 hover:text-white transition-all transform hover:scale-105 text-center">
-                <h2 class="text-2xl font-bold mb-4">🥗 Generar Dieta</h2>
-                <p class="text-gray-300">Obtén un plan de comidas personalizado según tus metas y preferencias alimenticias.</p>
+                <h2 class="text-2xl font-bold mb-4">🥗 Dieta diaria</h2>
+                <p class="text-gray-300">Obtén un plan de comidas diario personalizado según tus metas y preferencias alimenticias.</p>
+            </a>
+
+            <!-- Opción 3: Suplementos -->
+            <a href="/suplementos" class="glass-card p-6 hover:bg-gradient-to-r hover:from-pink-400 hover:to-purple-600 hover:text-white transition-all transform hover:scale-105 text-center">
+                <h2 class="text-2xl font-bold mb-4">🛒 Suplementación</h2>
+                <p class="text-gray-300">Complementa tu salud con los mejores suplementos alimenticios para tu objetivo.</p>
             </a>
         </div>
     </div>
 </body>
 </html>
+
+
+
 
 
 

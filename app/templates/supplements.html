@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recomendaciones de Suplementos</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(to right, #ff9a9e, #fad0c4); /* Fondo degradado en tonos rosados */
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .glass-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.2); /* Fondo translúcido */
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4">
+        <h1 class="text-center text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 mb-6">
+            🌸 Generador de Suplementos Personalizados
+        </h1>
+        
+        <!-- Formulario -->
+        <div class="glass-card p-8 mb-6 max-w-lg mx-auto">
+            <form action="/suplementos" method="post" class="space-y-6">
+                <div>
+                    <label for="goal" class="block text-lg font-semibold text-gray-700">Objetivo:</label>
+                    <input type="text" id="goal" name="goal" class="w-full mt-1 p-3 rounded-lg bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Ejemplo: Ganar músculo, Perder peso" required>
+                </div>
+
+                <div>
+                    <label for="diet_type" class="block text-lg font-semibold text-gray-700">Tipo de dieta:</label>
+                    <input type="text" id="diet_type" name="diet_type" class="w-full mt-1 p-3 rounded-lg bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Ejemplo: Vegetariana, Keto" required>
+                </div>
+
+                <div>
+                    <label for="activity_level" class="block text-lg font-semibold text-gray-700">Nivel de actividad física:</label>
+                    <input type="text" id="activity_level" name="activity_level" class="w-full mt-1 p-3 rounded-lg bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Ejemplo: Bajo, Moderado, Alto" required>
+                </div>
+
+                <div>
+                    <label for="restrictions" class="block text-lg font-semibold text-gray-700">Restricciones alimenticias:</label>
+                    <input type="text" id="restrictions" name="restrictions" class="w-full mt-1 p-3 rounded-lg bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-pink-500" placeholder="Ejemplo: Sin gluten, Sin lactosa" required>
+                </div>
+
+                <div>
+                    <label for="budget" class="block text-lg font-semibold text-gray-700">Presupuesto:</label>
+                    <select id="budget" name="budget" class="w-full mt-1 p-3 rounded-lg bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-pink-500" required>
+                        <option value="Bajo">Bajo</option>
+                        <option value="Moderado">Moderado</option>
+                        <option value="Alto">Alto</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-purple-500 hover:to-pink-500 text-white font-bold py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all">
+                    🛒 Generar Recomendaciones
+                </button>
+            </form>
+        </div>
+
+        <!-- Mensaje motivacional -->
+        {% if message %}
+        <div class="glass-card p-6 mb-6 max-w-lg mx-auto">
+            <h4 class="text-2xl font-bold text-pink-400">¡Recomendaciones generadas con éxito! 🎉</h4>
+            <p class="mt-2 text-gray-700">{{ message }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Recomendaciones generadas -->
+        {% if supplements %}
+        <div class="glass-card p-6 max-w-lg mx-auto mt-6">
+            <h2 class="text-xl font-bold text-pink-400 mb-4">🔬 Recomendaciones de Suplementos</h2>
+        
+            <!-- Mostramos las recomendaciones con formato legible -->
+            <div class="bg-gray-900 text-gray-100 p-4 rounded-lg whitespace-pre-wrap">
+                <!-- Aplicamos estilos al contenido generado -->
+                {{ supplements | safe }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
+
+
