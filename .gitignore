@@ -1,0 +1,13 @@
+# Entornos virtuales
+env/
+venv/
+
+# Archivos sensibles
+.env
+
+# Archivos temporales y de caché
+__pycache__/
+*.pyc
+
+# Configuraciones del editor
+.vscode/
