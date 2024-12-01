@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generar Dieta</title>
+    <title>Generar dieta</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -43,7 +43,7 @@
 <body>
     <div class="container mx-auto px-4">
         <h1 class="text-center text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-600 mb-6">
-            🥗 Generador de Dietas Personalizadas
+            🥗 Generador de dietas personalizadas
         </h1>
         
         <!-- Formulario -->
@@ -60,7 +60,7 @@
                 </div>
 
                 <button type="submit" class="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-orange-600 hover:to-yellow-500 text-white font-bold py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all">
-                    🔍 Generar Dieta
+                    🔍 Generar dieta
                 </button>
             </form>
         </div>
@@ -81,7 +81,7 @@
         <!-- Dieta generada -->
         {% if diet %}
         <div class="glass-card p-6 max-w-lg mx-auto">
-            <h2 class="text-xl font-bold text-orange-500 mb-4">🍽️ Tu Dieta Personalizada</h2>
+            <h2 class="text-xl font-bold text-orange-500 mb-4">🍽️ Tu dieta personalizada</h2>
             <div class="bg-gray-900 text-gray-100 p-4 rounded-lg whitespace-pre-wrap">
                 {{ diet | replace("Desayuno:", "<b class='text-yellow-400'>Desayuno:</b>") 
                         | replace("Almuerzo:", "<b class='text-orange-400'>Almuerzo:</b>") 

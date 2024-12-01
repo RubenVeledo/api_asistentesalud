@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generar Rutina</title>
+    <title>Generar rutina</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -47,7 +47,7 @@
 <body>
     <div class="container mx-auto px-4">
         <h1 class="text-center text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 mb-6">
-            💪 Generador de Rutinas Personalizadas
+            💪 Generador de rutinas diarias personalizadas
         </h1>
         
         <!-- Formulario -->
@@ -74,7 +74,7 @@
                 </div>
 
                 <button type="submit" class="w-full bg-gradient-to-r from-green-400 to-blue-500 hover:from-blue-500 hover:to-green-400 text-white font-bold py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all">
-                    🔍 Generar Rutina
+                    🔍 Generar rutina
                 </button>
             </form>
         </div>
@@ -95,7 +95,7 @@
         <!-- Rutina generada -->
         {% if routine %}
         <div class="glass-card p-6 max-w-lg mx-auto">
-            <h2 class="text-xl font-bold text-blue-400 mb-4">💼 Tu Rutina Personalizada</h2>
+            <h2 class="text-xl font-bold text-blue-400 mb-4">💼 Tu rutina personalizada</h2>
             <div class="formatted-text bg-gray-900 text-gray-100 p-4 rounded-lg whitespace-pre-wrap">
                 {{ routine | replace("Calentamiento:", "<b>Calentamiento:</b>") 
                             | replace("Ejercicios principales:", "<b>Ejercicios principales:</b>") 
