@@ -15,7 +15,7 @@ templates = Jinja2Templates(directory="app/templates")
 # Configurar memoria conversacional
 memory = ConversationBufferMemory()
 
-# PromptTemplate mejorado para incluir nuevas variables
+# PromptTemplate
 supplements_prompt_template = PromptTemplate(
     input_variables=["goal", "diet_type", "activity_level", "restrictions", "budget"],
     template=(
@@ -43,10 +43,10 @@ def evaluate_supplements(response: str) -> dict:
     """
     evaluation = {
         "coherencia": "suplemento" in response.lower(),
-        "claridad": len(response.splitlines()) >= 3,  # Debe tener al menos 3 líneas
-        "completitud": len(response) > 100  # Mínimo de caracteres en la respuesta
+        "claridad": len(response.splitlines()) >= 3,  
+        "completitud": len(response) > 100 
     }
-    evaluation["aprobado"] = all(evaluation.values())  # Aprueba solo si todos los criterios se cumplen
+    evaluation["aprobado"] = all(evaluation.values()) 
     return evaluation
 
 
@@ -58,6 +58,7 @@ async def get_supplements_form(request: Request):
     """
     return templates.TemplateResponse("supplements.html", {"request": request})
 
+# Ruta POST para procesar los datos y mostrar el resultado
 @router.post("/suplementos", response_class=HTMLResponse)
 async def generate_supplements(
     request: Request,
@@ -79,7 +80,7 @@ async def generate_supplements(
         raise HTTPException(status_code=400, detail="Presupuesto inválido. Debe ser 'Bajo', 'Moderado' o 'Alto'.")
 
     try:
-        # Inicializar variables
+        # Se inicializan las variables variables y le damos un máximo de 3 intentos para generar una respuesta válida
         retries = 0
         max_retries = 3
         supplements = ""
@@ -87,7 +88,7 @@ async def generate_supplements(
 
         # Generar recomendaciones con reintentos si es necesario
         while not evaluation["aprobado"] and retries < max_retries:
-            # Generar el contenido del prompt
+            # Se tiene en cuenta el contenido del prompt
             prompt_content = supplements_prompt_template.format(
                 goal=goal,
                 diet_type=diet_type,
@@ -97,7 +98,7 @@ async def generate_supplements(
             )
             messages = [{"role": "user", "content": prompt_content}]
 
-            # Solicitar al modelo
+            # Llamamos al model
             completion = client.chat.completions.create(
                 model="microsoft/Phi-3.5-mini-instruct",
                 messages=messages,
@@ -105,7 +106,7 @@ async def generate_supplements(
             )
             response = completion.choices[0].message.content
 
-            # Evaluar la calidad de la respuesta
+            # Evaluación de la calidad de la respuesta
             evaluation = evaluate_supplements(response)
             retries += 1
 
@@ -126,7 +127,7 @@ async def generate_supplements(
             {"output": supplements}
         )
 
-        # Guardar la lista de suplementos en la base de datos
+        # Se guarda la lista de suplementos en la base de datos
         connection = get_connection()
         with connection.cursor() as cursor:
             insert_query = '''
@@ -136,7 +137,7 @@ async def generate_supplements(
             cursor.execute(insert_query, (goal, diet_type, activity_level, restrictions, budget, supplements))
             connection.commit()
 
-        # Aplicar formato al contenido generado
+        # Le aplicamos formato (negritas y colores) al contenido generado
         supplements = supplements.replace("Nombre del suplemento:", "<span class='font-bold text-pink-400'>Nombre del suplemento:</span>")
         supplements = supplements.replace("Beneficios clave:", "<span class='font-bold'>Beneficios clave:</span>")
         supplements = supplements.replace("Cómo y cuándo tomarlo:", "<span class='font-bold'>Cómo y cuándo tomarlo:</span>")

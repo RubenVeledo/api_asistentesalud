@@ -1,7 +1,7 @@
 import pymysql
 from app.config import MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_PORT, MYSQL_DB
 
-# Crear la conexión a la base de datos
+# Conexión a la base de datos
 def get_connection():
     try:
         connection = pymysql.connect(

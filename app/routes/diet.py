@@ -10,12 +10,12 @@ router = APIRouter()
 
 memory = ConversationBufferMemory(return_messages=True, memory_key="history", input_key="input")
 
-templates = Jinja2Templates(directory="app/templates")  # Configuración de templates
+templates = Jinja2Templates(directory="app/templates")
 
-# Configurar memoria conversacional
+# Memoria conversacional
 memory = ConversationBufferMemory()
 
-# PromptTemplate simplificado
+# Se define un PromptTemplate 
 diet_prompt_template = PromptTemplate(
     input_variables=["goal", "preferences"],
     template=(
@@ -38,10 +38,10 @@ def evaluate_diet(response: str) -> dict:
     """
     evaluation = {
         "coherencia": "Desayuno" in response and "Cena" in response,
-        "claridad": len(response.splitlines()) >= 4,  # Debe tener al menos 4 líneas
-        "completitud": len(response) > 50  # Mínimo de caracteres en la respuesta
+        "claridad": len(response.splitlines()) >= 4,
+        "completitud": len(response) > 50 
     }
-    evaluation["aprobado"] = all(evaluation.values())  # Aprueba solo si todos los criterios se cumplen
+    evaluation["aprobado"] = all(evaluation.values())
     return evaluation
 
 # Ruta GET para renderizar el formulario
@@ -60,19 +60,19 @@ async def post_diet(request: Request, goal: str = Form(...), preferences: str = 
     Guarda la dieta generada en la base de datos y la muestra al usuario.
     """
     try:
-        # Inicializar variables
+        # Se inicializan las variables variables y le damos un máximo de 3 intentos para generar una respuesta válida
         retries = 0
         max_retries = 3
         diet = ""
         evaluation = {"aprobado": False}
 
-        # Generar la dieta con reintentos si es necesario
+        # Geenrar la dieta con reintentos si es necesario
         while not evaluation["aprobado"] and retries < max_retries:
-            # Generar el contenido del prompt
+            # Se tiene en cuenta el contenido del prompt
             prompt_content = diet_prompt_template.format(goal=goal, preferences=preferences)
             messages = [{"role": "user", "content": prompt_content}]
 
-            # Solicitar al modelo
+            # Llamamos al modelo
             completion = client.chat.completions.create(
                 model="microsoft/Phi-3.5-mini-instruct",
                 messages=messages,
@@ -80,7 +80,7 @@ async def post_diet(request: Request, goal: str = Form(...), preferences: str = 
             )
             response = completion.choices[0].message.content
 
-            # Evaluar la calidad de la respuesta
+            # Evaluamos la calidad de la respuesta. Se imprime la respuesta que salga aprobada y se detiene el bucle
             evaluation = evaluate_diet(response)
             retries += 1
 
@@ -89,24 +89,24 @@ async def post_diet(request: Request, goal: str = Form(...), preferences: str = 
             else:
                 print(f"Reintento {retries}: Evaluación de calidad fallida. Solicitando nueva respuesta...")
 
-        # Si no se logró una respuesta válida
+        # Si no se logró una respuesta válida se imprime en pantalla (el usuario no lo ve)
         if not diet:
             raise HTTPException(status_code=500, detail="No se pudo generar una dieta válida tras varios intentos.")
 
-        # Guardar la interacción en memoria
+        # Guardamos la interacción en memoria
         memory.save_context(
             {"input": f"Objetivo: {goal}, Preferencias: {preferences}"},
             {"output": diet}
         )
 
-        # Guardar la dieta generada en la base de datos
+        # Se guarda la dieta generada en la base de datos
         connection = get_connection()
         with connection.cursor() as cursor:
             insert_query = '''
             INSERT INTO diets (goal, preferences, duration, diet)
             VALUES (%s, %s, %s, %s);
             '''
-            cursor.execute(insert_query, (goal, preferences, 1, diet))  # Duración siempre 1
+            cursor.execute(insert_query, (goal, preferences, 1, diet))
             connection.commit()
 
         # Mensaje motivacional
@@ -115,11 +115,11 @@ async def post_diet(request: Request, goal: str = Form(...), preferences: str = 
             f"y adaptado a tus preferencias: {preferences.lower()}."
         )
 
-        # Responder al usuario con la dieta en el template
+        # Se responde al usuario con la dieta y el mensaje motivacional en el template de HTML
         return templates.TemplateResponse("diet.html", {
             "request": request,
             "diet": diet,
-            "message": user_message,  # Enviar el mensaje motivacional al template
+            "message": user_message, 
             "goal": goal,
             "preferences": preferences
         })

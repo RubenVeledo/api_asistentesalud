@@ -12,12 +12,12 @@ router = APIRouter()
 
 memory = ConversationBufferMemory(return_messages=True, memory_key="history", input_key="input")
 
-templates = Jinja2Templates(directory="app/templates")  # Configuración de templates
+templates = Jinja2Templates(directory="app/templates")  
 
-# Configurar memoria conversacional
+# Memoria conversacional
 memory = ConversationBufferMemory()
 
-# PromptTemplate mejorado
+# PromptTemplate
 template = """
 Eres un asistente virtual experto en fitness y salud. Tu tarea es crear rutinas de ejercicios personalizadas 
 según las necesidades del usuario. Cada rutina debe incluir un calentamiento inicial, ejercicios principales 
@@ -56,10 +56,10 @@ def evaluate_response(response: str) -> dict:
     evaluation = {
         "coherencia": "1. Calentamiento" in response and "3. Enfriamiento" in response,
         "relevancia": "Ejercicio" in response,
-        "claridad": len(response.splitlines()) > 5,  # Debe tener varias líneas
-        "completitud": len(response) > 100  # Mínimo de caracteres en la respuesta
+        "claridad": len(response.splitlines()) > 5,
+        "completitud": len(response) > 100 
     }
-    evaluation["aprobado"] = all(evaluation.values())  # Aprueba solo si todos los criterios se cumplen
+    evaluation["aprobado"] = all(evaluation.values()) 
     return evaluation
 
 # Ruta GET para renderizar el formulario
@@ -86,21 +86,21 @@ async def post_routine(request: Request, level: str = Form(...), time: int = For
         context = memory.load_memory_variables({})
         previous_messages = context.get("history", "")
 
-        # Generar el contenido del prompt con el historial incluido
+        # Generamos el contenido del prompt con el historial incluido
         prompt_content = (
             f"Historial previo:\n{previous_messages}\n\n"
             + prompt_template.format(level=level, time=time, equipment=equipment, goal=goal)
         )
 
-        # Inicializar variables
-        max_retries = 3  # Número máximo de intentos para obtener una respuesta válida
+        # Se inicializan las variables variables y le damos un máximo de 3 intentos para generar una respuesta válida
+        max_retries = 3
         retries = 0
         evaluation = {"aprobado": False}
         routine = ""
 
-        # Generar respuestas hasta cumplir los criterios o agotar intentos
+        # Se generarán respuestas hasta cumplir los criterios o agotar intentos
         while not evaluation["aprobado"] and retries < max_retries:
-            # Crear el mensaje para el modelo
+            # Se crea el mensaje
             messages = [
                 {
                     "role": "user",
@@ -108,22 +108,21 @@ async def post_routine(request: Request, level: str = Form(...), time: int = For
                 }
             ]
 
-            # Solicitar la respuesta al modelo
+            # Llamamos al modelo
             completion = client.chat.completions.create(
                 model="microsoft/Phi-3.5-mini-instruct",
                 messages=messages,
                 max_tokens=750
             )
 
-            # Extraer la respuesta generada
             routine = completion.choices[0].message.content
 
-            # Evaluar la calidad de la respuesta
+            # Evaluamos la calidad de la respuesta. Se imprime la respuesta que salga aprobada y se detiene el bucle
             evaluation = evaluate_response(routine)
             retries += 1
             print(f"Intento número {retries}: Evaluación de calidad: {evaluation}")
 
-        # Guardar la interacción en memoria
+        # Guardamos la interacción en memoria
         memory.save_context(
             {"input": f"Nivel: {level}, Tiempo: {time}, Equipamiento: {equipment}, Objetivo: {goal}"},
             {"output": routine}
@@ -138,12 +137,12 @@ async def post_routine(request: Request, level: str = Form(...), time: int = For
             f"¡Rutina personalizada entregada! Perfecta para un nivel {level.lower()}, con {time} minutos de duración, enfocada en {goal.lower()} y usando {equipment.lower()}. ¡Éxito en tu entrenamiento!"
         ]
 
-        # Elegir un mensaje al azar
+        # Se elegirá un mensaje al azar para cada respuesta
         user_message = random.choice(motivational_messages)
 
-        # Guardar la rutina generada en la base de datos
+        # Se guarda la rutina generada en la base de datos
         connection = get_connection()
-        connection.select_db("database_api_llm")  # Seleccionar la base de datos específica
+        connection.select_db("database_api_llm")
         with connection.cursor() as cursor:
             insert_query = '''
             INSERT INTO routines (level, time, equipment, goal, routine)
@@ -152,11 +151,11 @@ async def post_routine(request: Request, level: str = Form(...), time: int = For
             cursor.execute(insert_query, (level, time, equipment, goal, routine))
             connection.commit()
 
-        # Responder al usuario con la rutina, mensaje motivacional y datos ingresados
+        # Se responde al usuario con la rutina, mensaje motivacional y datos ingresados
         return templates.TemplateResponse("routine.html", {
             "request": request,
             "routine": routine,
-            "message": user_message,  # Enviar el mensaje al template
+            "message": user_message, 
             "level": level,
             "time": time,
             "equipment": equipment,
