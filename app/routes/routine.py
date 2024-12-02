@@ -43,7 +43,7 @@ Estructura de la respuesta:
    - Ejercicio 1: Descripción breve
    - Ejercicio 2: Descripción breve
 
-Incluye comentarios adicionales si es necesario.
+Nunca incluyas comentarios adicionales.
 """
 prompt_template = PromptTemplate(input_variables=["level", "time", "equipment", "goal"], template=template)
 
